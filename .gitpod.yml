@@ -1,0 +1,5 @@
+tasks:
+  - before: npm i -g pnpm
+    init: |
+      pnpm install
+      pnpm build
