@@ -1,15 +1,15 @@
 # hwd
 
-Create for pnpm monorepo project. It config the resolution strategy by using [exports sugar](https://nodejs.org/api/packages.html#packages_exports_sugar). 
+Create for pnpm monorepo project. It configs the resolution strategy by using [exports sugar](https://nodejs.org/api/packages.html#packages_exports_sugar). 
 
-You can import the installed packages of other workspaces by statements like `import { foo } from '@monorepo/foo/shared/foo'`.  Node(v12.11.0+) and bundlers likes `webpack`, `rollup`, `vite` can find the correct package from the `node_modules` of `@monorepo/foo`.
+You can import the dependent modules in other workspaces, i.e. `import { foo } from '@monorepo/foo/shared/bar'`.  Node(v12.11.0+) and many bundlers  `webpack`, `rollup`, `vite` has already support this feature for resolving the correct package `bar` in the `node_modules` of `@monorepo/foo`.
 
 By default, the internal workspace is recognized by the pnpm style package version `workspace: *`
 
 ## Usage
 
 ```shell
-$: pnpx hwd -h                                                                                                                                                                                 [8:29:16 下午]
+$: pnpx hwd -h                                                                                                                                                                                 
 
 hwd(hoistWorkspaceDependencies): hoist workspace dependencies to the exports field of package.json
         -h	print the help message.
