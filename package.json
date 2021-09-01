@@ -1,0 +1,22 @@
+{
+  "name": "hwd",
+  "version": "0.0.1",
+  "description": "hoist workspace dependencies to the exports field of package.json",
+  "main": "bin/index.js",
+  "types": "bin/index.d.ts",
+  "bin": {
+    "hwd": "bin/index.js",
+    "hoistWorkspaceDependencies": "bin/index.js"
+  },
+  "scripts": {
+    "build": "swc src -d bin --config-file '.swcrc' && tsc -b ./tsconfig.json"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@swc/cli": "^0.1.49",
+    "@swc/core": "^1.2.83",
+    "@types/node": "^16.7.10",
+    "typescript": "^4.4.2"
+  }
+}
