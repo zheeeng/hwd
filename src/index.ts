@@ -6,7 +6,7 @@ const argv = process.argv.slice(2).join(' ')
 
 if (argv === '-h') {
     process.stdout.write(`\
-\nhwd(hoistWorkspaceDependencies): hoist workspace dependencies to the exports field of package.json
+\nhwd(hoistWorkspaceDependencies): hoist workspace dependency entries to the exports field of the project package.json
         -h\tprint the help message.
         -s\tspecify the shared folder alias, default to 'shared'.
         -n\tspecify the node_modules folder alias, default to 'node_modules'.
@@ -60,7 +60,7 @@ if (argvUseless.trim()) {
 const pkgPath = path.resolve(option.cwd, './package.json')
 const pkg: { exports: Record<string, string>, dependencies: Record<string, string> } = require(pkgPath)
 
-const nonWorkspaceDependencyNames = Object.entries<string>(pkg.dependencies).filter(([name, ver]) => !name.startsWith('@types') && !ver.startsWith(option.workspaceMark))
+const nonWorkspaceDependencyNames = Object.entries<string>(pkg?.dependencies ?? {}).filter(([name, ver]) => !name.startsWith('@types') && !ver.startsWith(option.workspaceMark))
 
 const pkgs = nonWorkspaceDependencyNames.map(([name]): [name: string, pkgEntry: string] | null => {
     type packageExportsEntryPath = string | null

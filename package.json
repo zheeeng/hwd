@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "description": "hoist workspace dependencies to the exports field of package.json",
+  "description": "hoist workspace dependency entries to the exports field of the project package.json",
   "main": "bin/index.js",
   "types": "bin/index.d.ts",
   "bin": {
