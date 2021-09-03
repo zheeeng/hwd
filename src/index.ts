@@ -58,7 +58,7 @@ if (argvUseless.trim()) {
 }
 
 const pkgPath = path.resolve(option.cwd, './package.json')
-const pkg: { exports: Record<string, string>, dependencies: Record<string, string> } = require(pkgPath)
+const pkg: { exports?: Record<string, string>, dependencies?: Record<string, string> } = require(pkgPath)
 
 const nonWorkspaceDependencyNames = Object.entries<string>(pkg?.dependencies ?? {}).filter(([name, ver]) => !name.startsWith('@types') && !ver.startsWith(option.workspaceMark))
 
@@ -94,7 +94,7 @@ const modifiedPkg = {
     ...pkg,
     exports: Object.fromEntries(new Map([
         ...Object.entries(exportsField),
-        ...Object.entries(pkg.exports),
+        ...Object.entries(pkg.exports ?? {}),
     ]))
 }
 
