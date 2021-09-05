@@ -90,11 +90,19 @@ const exportsField = pkgs.reduce<Record<string, string>>((field, [pkgName, pkgEn
     return field
 }, {})
 
+const originExportsField = Object.entries(pkg.exports ?? {}).reduce<Record<string, string>>((field, [pkgName, pkgEntry]) => {
+    if (pkgName.startsWith(`./${option.sharedFolderName}/`)) return field
+
+    field[pkgName] = pkgEntry
+
+    return field
+}, {})
+
 const modifiedPkg = {
     ...pkg,
     exports: Object.fromEntries(new Map([
         ...Object.entries(exportsField),
-        ...Object.entries(pkg.exports ?? {}),
+        ...Object.entries(originExportsField),
     ]))
 }
 
