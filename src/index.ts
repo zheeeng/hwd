@@ -86,6 +86,7 @@ const pkgs = nonWorkspaceDependencyNames.map(([name]): [name: string, pkgEntry: 
 
 const exportsField = pkgs.reduce<Record<string, string>>((field, [pkgName, pkgEntry]) => {
     field[`./${option.sharedFolderName}/${pkgName}`] = `./${option.nodeModulesFolderName}/${pkgName}/${pkgEntry}`
+    field[`./${option.sharedFolderName}/${pkgName}/*`] = `./${option.nodeModulesFolderName}/${pkgName}/*`
 
     return field
 }, {})
