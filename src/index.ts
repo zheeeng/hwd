@@ -94,8 +94,9 @@ const pkgs = nonWorkspaceDependencyNames.map(
                     ?? pkgEntryFromExportsField?.node
                     ?? pkgModuleField
                     ?? pkgMainField
+                    ?? 'index.js'
 
-            return pkgEntry ? [name, pkgEntry] : null
+            return [name, pkgEntry]
         } catch (e) {
             return null
         }
