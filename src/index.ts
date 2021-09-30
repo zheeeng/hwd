@@ -58,31 +58,49 @@ if (argvUseless.trim()) {
 }
 
 const pkgPath = path.resolve(option.cwd, './package.json')
-const pkg: { exports?: Record<string, string>, dependencies?: Record<string, string> } = require(pkgPath)
+const pkg: {
+    exports?: Record<string, string>,
+    dependencies?: Record<string, string>,
+    sharedFolderName?: string,
+} = require(pkgPath)
 
 const nonWorkspaceDependencyNames = Object.entries<string>(pkg?.dependencies ?? {}).filter(([name, ver]) => !name.startsWith('@types') && !ver.startsWith(option.workspaceMark))
 
-const pkgs = nonWorkspaceDependencyNames.map(([name]): [name: string, pkgEntry: string] | null => {
-    type packageExportsEntryPath = string | null
-    type packageExportsEntryObject = {
-        require: packageExportsEntryPath
-        import: packageExportsEntryPath,
-        node: packageExportsEntryPath,
-        default: packageExportsEntryPath
-    }
+const pkgs = nonWorkspaceDependencyNames.map(
+    ([name]): [name: string, pkgEntry: string] | null => {
+        type packageExportsEntryPath = string | null
+        type packageExportsEntryObject = {
+            require: packageExportsEntryPath
+            import: packageExportsEntryPath,
+            node: packageExportsEntryPath,
+            default: packageExportsEntryPath
+        }
 
-    try {
-        const depPkg: { main?: string, exports?: Record<string, packageExportsEntryPath> | Record<string, packageExportsEntryObject>, } = require(path.resolve(option.cwd, `./${option.nodeModulesFolderName}/${name}/package.json`))
+        try {
+            const depPkg: {
+                main?: string,
+                module?: string,
+                exports?: Record<string, packageExportsEntryPath> | Record<string, packageExportsEntryObject>,
+            } = require(path.resolve(option.cwd, `./${option.nodeModulesFolderName}/${name}/package.json`))
 
-        const pkgMainField = depPkg.main
-        const pkgEntryFromExportsField = depPkg.exports?.['.']
-        const pkgEntry = typeof pkgEntryFromExportsField === 'string' ? pkgEntryFromExportsField : (pkgEntryFromExportsField?.default ?? pkgEntryFromExportsField?.import ?? pkgEntryFromExportsField?.require ?? pkgEntryFromExportsField?.node) ?? pkgMainField ?? 'index.js'
-    
-        return [name, pkgEntry]
-    } catch (e) {
-        return null
+            const pkgModuleField = depPkg.module
+            const pkgMainField = depPkg.main
+            const pkgEntryFromExportsField = depPkg.exports?.['.']
+            const pkgEntry = typeof pkgEntryFromExportsField === 'string'
+                ? pkgEntryFromExportsField
+                : pkgEntryFromExportsField?.default
+                    ?? pkgEntryFromExportsField?.import
+                    ?? pkgEntryFromExportsField?.require
+                    ?? pkgEntryFromExportsField?.node
+                    ?? pkgModuleField
+                    ?? pkgMainField
+
+            return pkgEntry ? [name, pkgEntry] : null
+        } catch (e) {
+            return null
+        }
     }
-}).filter(<T>(i: T | null): i is T => !!i)
+).filter(<T>(i: T | null): i is T => !!i)
 
 const exportsField = pkgs.reduce<Record<string, string>>((field, [pkgName, pkgEntry]) => {
     field[`./${option.sharedFolderName}/${pkgName}`] = `./${option.nodeModulesFolderName}/${pkgName}/${pkgEntry}`
@@ -92,7 +110,7 @@ const exportsField = pkgs.reduce<Record<string, string>>((field, [pkgName, pkgEn
 }, {})
 
 const originExportsField = Object.entries(pkg.exports ?? {}).reduce<Record<string, string>>((field, [pkgName, pkgEntry]) => {
-    if (pkgName.startsWith(`./${option.sharedFolderName}/`)) return field
+    if (pkgName.startsWith(`./${pkg.sharedFolderName ?? option.sharedFolderName}/`)) return field
 
     field[pkgName] = pkgEntry
 
@@ -101,6 +119,7 @@ const originExportsField = Object.entries(pkg.exports ?? {}).reduce<Record<strin
 
 const modifiedPkg = {
     ...pkg,
+    sharedFolderName: option.sharedFolderName,
     exports: Object.fromEntries(new Map([
         ...Object.entries(exportsField),
         ...Object.entries(originExportsField),
